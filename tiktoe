@@ -1,0 +1,250 @@
+HTML CODE FOR TICTOE 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tic-Tac-Toe</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Tic-Tac-Toe</h1>
+        <div id="board">
+            <div class="cell" data-index="0"></div>
+            <div class="cell" data-index="1"></div>
+            <div class="cell" data-index="2"></div>
+            <div class="cell" data-index="3"></div>
+            <div class="cell" data-index="4"></div>
+            <div class="cell" data-index="5"></div>
+            <div class="cell" data-index="6"></div>
+            <div class="cell" data-index="7"></div>
+            <div class="cell" data-index="8"></div>
+        </div>
+        <div id="status"></div>
+        <button id="restartButton">Restart Game</button>
+    </div>
+
+    <div id="winnerPopup" class="popup">
+        <div class="popup-content">
+            <span class="close" id="closePopup">&times;</span>
+            <p id="winnerMessage"></p>
+            <button id="restartButtonPopup">Restart Game</button>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
+
+CSS ..........///////
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    background: url('https://source.unsplash.com/1600x900/?nature,waterfall') no-repeat center center fixed;
+    background-size: cover;
+    font-family: 'Arial', sans-serif;
+}
+
+.container {
+    text-align: center;
+    background: rgba(255, 255, 255, 0.8);
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+h1 {
+    margin: 0 0 20px;
+    font-size: 2.5em;
+    color: #333;
+}
+
+#board {
+    display: grid;
+    grid-template-columns: repeat(3, 100px);
+    grid-template-rows: repeat(3, 100px);
+    gap: 5px;
+    margin-bottom: 20px;
+}
+
+.cell {
+    width: 100px;
+    height: 100px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2em;
+    background: #fff;
+    border: 2px solid #333;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+.cell:hover {
+    background: #f0f0f0;
+}
+
+#status {
+    margin-bottom: 20px;
+    font-size: 1.5em;
+    color: #333;
+}
+
+#restartButton {
+    padding: 10px 20px;
+    font-size: 1em;
+    color: #fff;
+    background: #4CAF50;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+#restartButton:hover {
+    background: #45a049;
+}
+
+.popup {
+    display: none;
+    position: fixed;
+    z-index: 1;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgb(0, 0, 0);
+    background-color: rgba(0, 0, 0, 0.4);
+}
+
+.popup-content {
+    background-color: #fefefe;
+    margin: 15% auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 80%;
+    max-width: 400px;
+    text-align: center;
+    border-radius: 10px;
+}
+
+.close {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+#restartButtonPopup {
+    padding: 10px 20px;
+    font-size: 1em;
+    color: #fff;
+    background: #4CAF50;
+    border: none;
+    border-radius: 5px
+
+
+JS ................///////
+document.addEventListener('DOMContentLoaded', () => {
+    const board = document.querySelector('#board');
+    const cells = document.querySelectorAll('.cell');
+    const status = document.querySelector('#status');
+    const restartButton = document.querySelector('#restartButton');
+    const winnerPopup = document.querySelector('#winnerPopup');
+    const winnerMessage = document.querySelector('#winnerMessage');
+    const closePopup = document.querySelector('#closePopup');
+    const restartButtonPopup = document.querySelector('#restartButtonPopup');
+    
+    let currentPlayer = 'X';
+    let gameActive = true;
+    const winningConditions = [
+        [0, 1, 2],
+        [3, 4, 5],
+        [6, 7, 8],
+        [0, 3, 6],
+        [1, 4, 7],
+        [2, 5, 8],
+        [0, 4, 8],
+        [2, 4, 6]
+    ];
+
+    const handleCellClick = (event) => {
+        const cell = event.target;
+        const cellIndex = parseInt(cell.getAttribute('data-index'));
+
+        if (cell.innerText !== '' || !gameActive) {
+            return;
+        }
+
+        cell.innerText = currentPlayer;
+        checkResult();
+
+        currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
+    };
+
+    const checkResult = () => {
+        let roundWon = false;
+        for (let i = 0; i < winningConditions.length; i++) {
+            const [a, b, c] = winningConditions[i];
+            if (cells[a].innerText === '' || cells[b].innerText === '' || cells[c].innerText === '') {
+                continue;
+            }
+            if (cells[a].innerText === cells[b].innerText && cells[b].innerText === cells[c].innerText) {
+                roundWon = true;
+                break;
+            }
+        }
+
+        if (roundWon) {
+            status.innerText = '';
+            winnerMessage.innerText = `Player ${currentPlayer} Wins!`;
+            winnerPopup.style.display = 'block';
+            gameActive = false;
+            return;
+        }
+
+        let roundDraw = true;
+        for (let i = 0; i < cells.length; i++) {
+            if (cells[i].innerText === '') {
+                roundDraw = false;
+                break;
+            }
+        }
+
+        if (roundDraw) {
+            status.innerText = '';
+            winnerMessage.innerText = 'Draw!';
+            winnerPopup.style.display = 'block';
+            gameActive = false;
+            return;
+        }
+
+        status.innerText = `Player ${currentPlayer}'s turn`;
+    };
+
+    const restartGame = () => {
+        currentPlayer = 'X';
+        gameActive = true;
+        status.innerText = `Player ${currentPlayer}'s turn`;
+        cells.forEach(cell => cell.innerText = '');
+        winnerPopup.style.display = 'none';
+    };
+
+    cells.forEach(cell => cell.addEventListener('click', handleCellClick));
+    restartButton.addEventListener('click', restartGame);
+    restartButtonPopup.addEventListener('click', restartGame);
+    closePopup.addEventListener('click', () => winnerPopup.style.display = 'none');
+    status.innerText = `Player ${currentPlayer}'s turn`;
+});
